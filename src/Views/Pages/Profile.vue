@@ -3,23 +3,83 @@ import { onMounted, ref } from "vue";
 import SiddebarWithNavbar from "../../components/SidebarWithNavbar.vue";
 import { useStore } from "vuex";
 import axios from "axios";
-import Swal from "sweetalert2";
 import Spinner from "@/components/Spinner.vue";
-import { isSidebarOpen, sidebarToggle } from "@/utils/utils";
+import {
+  isSidebarOpen,
+  sidebarToggle,
+  handleSuccess,
+  handleError,
+  validateNip,
+} from "@/utils/utils";
 
 const store = useStore();
 const userData = ref("");
+const token = ref();
 const formPassword = ref(false);
 const oldPassword = ref("");
 const newPassword = ref("");
 const confirmPassword = ref("");
 const showPassword = ref(false);
 const isLoading = ref(false);
-
+const isEditing = ref(false);
+const nipError = ref(false);
+const users = ref({
+  nip: "",
+  username: "",
+  role: "",
+  email: "",
+});
 onMounted(() => {
   userData.value = store.getters.getUserData;
-  console.log(userData.value);
+  token.value = localStorage.getItem("authToken");
+
+  getUsers();
 });
+
+const getUsers = async () => {
+  try {
+    const res = await axios.get(`/auth/users/${userData.value.id}`, {
+      headers: {
+        Authorization: "Bearer " + token.value,
+      },
+    });
+
+    users.value = res.data;
+  } catch (error) {
+    console.error("Fail get Users " + error);
+  }
+};
+
+const validNip = (nip) => {
+  nipError.value = !validateNip(nip);
+};
+
+const toggleEdit = () => {
+  isEditing.value = !isEditing.value;
+};
+
+const saveProfileChanges = async () => {
+  try {
+    isLoading.value = true;
+    const response = await axios.put(
+      `/auth/update/${userData.value.id}`,
+      users.value
+    );
+
+    handleSuccess("Profil berhasil diperbarui!");
+    isEditing.value = false;
+    console.log(response.status);
+  } catch (error) {
+    console.error("ERROR Update : " + error);
+    if (error.response) {
+      handleError(error.response.data.message);
+    } else {
+      handleError("Terjadi kesalahan saat memperbarui profil");
+    }
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 const togglePassword = () => {
   formPassword.value = !formPassword.value;
@@ -47,46 +107,21 @@ const changePassword = async () => {
         "/auth/update-password",
         passwordRequest
       );
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: "Kata sandi berhasil diperbarui",
-        showConfirmButton: true,
-        timerProgressBar: true,
-      });
+      handleSuccess("Kata sandi berhasil diperbarui");
       isLoading.value = false;
     } else {
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Kata sandi baru dan konfirmasi kata sandi tidak cocok",
-        showConfirmButton: true,
-        timerProgressBar: true,
-        timer: 2000,
-      });
+      handleError("Kata sandi baru dan konfirmasi kata sandi tidak cocok");
     }
   } catch (error) {
     console.error("ERROR Update : " + error);
     if (error.response) {
-      Swal.fire({
-        position: "center",
-        title: error.response.data.message,
-        showConfirmButton: true,
-        timer: 3000,
-      });
-      isLoading.value = false;
+      handleError(error.response.data.message);
     } else {
-      Swal.fire({
-        position: "center",
-        icon: "error",
-        title: "Terjadi kesalahan saat memperbarui kata sandi",
-        showConfirmButton: true,
-        timerProgressBar: true,
-        timer: 5000,
-      });
+      handleError("Terjadi kesalahan saat memperbarui kata sandi");
     }
   } finally {
     resetForm();
+    isLoading.value = false;
   }
 };
 </script>
@@ -116,7 +151,7 @@ const changePassword = async () => {
         <div
           class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mt-4"
         >
-          <div class="flex flex-col items-center pb-10">
+          <div class="flex flex-col items-center mt-4 pb-10">
             <svg
               class="w-20 h-20 text-gray-800 dark:text-white"
               aria-hidden="true"
@@ -131,24 +166,93 @@ const changePassword = async () => {
               />
             </svg>
 
-            <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-              {{ userData.username }}
-            </h5>
-            <span class="text-sm text-gray-500 dark:text-gray-400">{{
-              userData.role
-            }}</span>
-            <span class="text-sm text-gray-500 dark:text-gray-400">{{
-              userData.nip ? userData.nip : "-"
-            }}</span>
-            <span class="text-sm text-gray-500 dark:text-gray-400">{{
-              userData.email ? userData.email : "-"
-            }}</span>
-            <div class="flex mt-4 md:mt-6">
+            <!-- Editable NIP and Email -->
+            <div v-if="isEditing">
+              <label class="text-sm text-gray-500 mb-1 dark:text-gray-400"
+                >Username</label
+              >
+              <input
+                v-model="users.username"
+                class="bg-gray-50 border cursor-not-allowed border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white mb-3"
+                disabled
+              />
+              <label class="text-sm text-gray-500 mb-1 dark:text-gray-400"
+                >Role</label
+              >
+              <input
+                v-model="users.role"
+                class="bg-gray-50 border cursor-not-allowed border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white mb-3"
+                disabled
+              />
+              <label class="text-sm text-gray-500 mb-1 dark:text-gray-400"
+                >NIP</label
+              >
+              <input
+                type="text"
+                v-model="users.nip"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white mb-3"
+                placeholder="Masukkan NIP (23-1234)"
+                @input="validNip(users.nip)"
+              />
+              <span v-if="nipError" class="block text-red-500 text-sm">
+                Format NIP tidak valid. Harus berupa 23-1234.
+              </span>
+              <label class="text-sm text-gray-500 mb-1 dark:text-gray-400"
+                >Email</label
+              >
+              <input
+                type="email"
+                v-model="users.email"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white mb-3"
+                placeholder="Masukkan Email"
+              />
+            </div>
+            <div class="flex flex-col text-center mt-4" v-else>
+              <h5
+                class="mb-6 text-xl font-medium uppercase text-gray-900 dark:text-white"
+              >
+                {{ users.username }}
+              </h5>
+              <span class="text-sm text-gray-500 mb-2 dark:text-gray-400">
+                {{ users.role }}
+              </span>
+
+              <span class="text-sm text-gray-500 mb-2 dark:text-gray-400">
+                {{ users.nip ? users.nip : "-" }}
+              </span>
+              <span class="text-sm text-gray-500 mb-2 dark:text-gray-400">
+                {{ users.email ? users.email : "-" }}
+              </span>
+            </div>
+
+            <div class="flex gap-2 mt-4 md:mt-6">
               <button
+                v-if="!isEditing"
                 @click="togglePassword()"
                 class="inline-flex items-center px-4 py-2 mt-10 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Ubah Kata Sandi
+              </button>
+              <button
+                v-if="!isEditing"
+                @click="toggleEdit()"
+                class="inline-flex items-center px-4 py-2 mt-10 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+              >
+                Edit Profil
+              </button>
+              <button
+                v-if="isEditing"
+                @click="toggleEdit()"
+                class="inline-flex items-center px-4 py-2 mt-10 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
+              >
+                Cancel
+              </button>
+              <button
+                v-if="isEditing"
+                @click="saveProfileChanges"
+                class="inline-flex items-center px-4 py-2 mt-10 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
+              >
+                Simpan Perubahan
               </button>
             </div>
           </div>

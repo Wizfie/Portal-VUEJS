@@ -13,6 +13,10 @@ import {
   isSidebarOpen,
   sendEmail,
   emailEvent,
+<<<<<<< HEAD
+=======
+  getEmailAdmin,
+>>>>>>> 60db218 (update)
 } from "@/utils/utils";
 
 const store = useStore();
@@ -234,7 +238,11 @@ const createEvent = async () => {
       toggleCreate();
 
       // Generate konten email
+<<<<<<< HEAD
       const emailContent = emailEvent(eventData);
+=======
+      const emailContent = await emailEvent(eventData);
+>>>>>>> 60db218 (update)
 
       const toEmails = userList.value
         .map((user) => user.email)
@@ -244,11 +252,17 @@ const createEvent = async () => {
       const mailRequest = {
         to: toEmails,
         cc: [],
+<<<<<<< HEAD
         bcc: ["wiz.fie@gmail.com"],
         subject: `Undangan Partisipasi Program ${eventData.event.eventName}`,
         text: emailContent, // Kirim HTML
         name: "Admin",
         from: "admin@example.com",
+=======
+        bcc: [user.value.email],
+        subject: `Undangan Partisipasi Program ${eventData.event.eventName}`,
+        text: emailContent,
+>>>>>>> 60db218 (update)
       };
 
       await sendEmail(mailRequest);

@@ -3,7 +3,24 @@ import { ref } from "vue";
 import axios from "axios";
 
 const isLoading = ref(false);
-const emailReject = (file, user, reasons) => {
+const adminEmail = ref();
+
+const validateNip = (nip) => {
+  const nipPattern = /^\d{2}-\d{4}$/; // Format 23-1234
+  return nipPattern.test(nip);
+};
+
+const getEmailAdmin = async () => {
+  try {
+    const response = await axios.get("/auth/admin");
+    adminEmail.value = response.data[0].email;
+    console.log(adminEmail.value);
+  } catch (error) {
+    console.error("Fail get email Admin " + error);
+  }
+};
+const emailReject = async (file, user, reasons) => {
+  await getEmailAdmin();
   const currentDate = new Date().toLocaleDateString("id-ID", {
     year: "numeric",
     month: "long",
@@ -41,7 +58,7 @@ const emailReject = (file, user, reasons) => {
     </br>
     <p>${reason}</p>
 
-    <p>Mungkin bisa dicoba revisi lagi sesuai masukan yang ada, terus upload ulang ya. Jangan patah semangat, kita yakin kamu bisa kok! Kalau butuh bantuan atau penjelasan lebih lanjut, jangan ragu untuk hubungi kami di [Kontak Kami], ya!
+    <p>Mungkin bisa dicoba revisi lagi sesuai masukan yang ada, terus upload ulang ya. Jangan patah semangat, kita yakin kamu bisa kok! Kalau butuh bantuan atau penjelasan lebih lanjut, jangan ragu untuk hubungi kami di <a href=mailto:${adminEmail.value}> [Kontak Kami] </a> , ya!
     </p>
     <p>Terima kasih banyak sudah mau berusaha, ya!</p>
     <p>Salam hangat,</p>
@@ -51,7 +68,8 @@ const emailReject = (file, user, reasons) => {
   `;
 };
 
-const emailApproval = (file, user) => {
+const emailApproval = async (file, user) => {
+  await getEmailAdmin();
   const currentDate = new Date().toLocaleDateString("id-ID", {
     year: "numeric",
     month: "long",
@@ -85,7 +103,7 @@ const emailApproval = (file, user) => {
     </ul>
     <p>Terima kasih atas kontribusi berharga Anda dalam kegiatan Continuous Improvement ini. Kami sangat mengapresiasi dedikasi Anda dalam mendukung upaya peningkatan berkelanjutan ini.
     </p>
-    <p>Jika Anda memiliki pertanyaan lebih lanjut, jangan ragu untuk menghubungi kami di [Kontak Kami]</p>
+    <p>Jika Anda memiliki pertanyaan lebih lanjut, jangan ragu untuk menghubungi kami di <a href=mailto:${adminEmail.value}> [Kontak Kami] </a></p>
     <p>Salam hangat,</p>
     <p>Komite Continuous Improvement Logistic</p>
     </body>
@@ -93,7 +111,8 @@ const emailApproval = (file, user) => {
   `;
 };
 
-const emailRegistration = (selectedTeam, selectedEvent, user) => {
+const emailRegistration = async (selectedTeam, selectedEvent, user) => {
+  await getEmailAdmin();
   const currentDate = new Date().toLocaleDateString("id-ID", {
     year: "numeric",
     month: "long",
@@ -127,7 +146,7 @@ const emailRegistration = (selectedTeam, selectedEvent, user) => {
       <li><strong>Nama Event:</strong> ${event}</li>
       <li><strong>Tanggal:</strong> ${currentDate}</li>
     </ul>
-    <p>Kami sangat senang rekan-rekan dapat bergabung bersama kami. Jangan lupa untuk membawa antusiasme dan semangat ber-improvement selalu yaa! Jika memiliki pertanyaan atau memerlukan informasi lebih lanjut, silakan hubungi kami di [Kontak Kami].</p>
+    <p>Kami sangat senang rekan-rekan dapat bergabung bersama kami. Jangan lupa untuk membawa antusiasme dan semangat ber-improvement selalu yaa! Jika memiliki pertanyaan atau memerlukan informasi lebih lanjut, silakan hubungi kami di <a href=mailto:${adminEmail.value}> [Kontak Kami] </a>.</p>
     <p>Sampai jumpa di Continuous Improvement (QCC & Suggestion System)!</p>
     <p>Salam hangat,</p>
     <p>Komite Continuous Improvement Logistic</p>
@@ -136,8 +155,10 @@ const emailRegistration = (selectedTeam, selectedEvent, user) => {
   `;
 };
 
-const emailEvent = (eventData) => {
+const emailEvent = async (eventData) => {
   const steps = eventData.steps;
+
+  await getEmailAdmin();
 
   // Cari tanggal paling awal dan paling akhir
   const earliestStartDate = steps.reduce((earliest, step) => {
@@ -147,6 +168,9 @@ const emailEvent = (eventData) => {
   const latestEndDate = steps.reduce((latest, step) => {
     return latest > step.endDate ? latest : step.endDate;
   }, steps[0].endDate);
+
+  const websiteURL =
+    import.meta.env.VITE_WEBSITE_URL || "http://localhost:8080";
 
   // Susun email HTML
   return `
@@ -184,12 +208,12 @@ const emailEvent = (eventData) => {
 
       <b>Cara Pendaftaran:</b>
 
-      <p>Klik link berikut untuk mendaftar pada program QCC dan/atau Suggestion System: <a href="www.google.com">Website</a></p>
+      <p>Klik link berikut untuk mendaftar pada program QCC dan/atau Suggestion System: <a href="${websiteURL}"> Website</a></p>
 
       <p>Dengan berpartisipasi, Anda akan menjadi bagian dari perubahan nyata menuju peningkatan kualitas yang berkelanjutan. Mari bersama-sama membawa inovasi dan transformasi di setiap aspek pekerjaan kita!</p>
 
       <p>Jika Anda memiliki pertanyaan lebih lanjut, hubungi kami di 
-      <a href="mailto:contact@komite.com">contact@komite.com</a>.</p>
+      <a href=mailto:${adminEmail.value}> [Kontak Kami] </a>.</p>
 
       <p>Salam hangat,<br>Komite Continuous Improvement</p>
     </body>
@@ -203,19 +227,8 @@ const sendEmail = async (mailRequest) => {
 
     await axios.post("/email/send", mailRequest);
 
-    // Swal.fire({
-    //   icon: "success",
-    //   title: "Email Sent",
-    //   text: "Notification email has been sent successfully.",
-
-    // });
     console.info("Email Send");
   } catch (error) {
-    // Swal.fire({
-    //   icon: "error",
-    //   title: "Email Failed",
-    //   text: "There was an error sending the email.",
-    // });
     console.error("Error sending email:", error);
   } finally {
     isLoading.value = false;
@@ -384,6 +397,7 @@ const formatScore = (score) => {
 };
 
 export {
+  validateNip,
   handleSearch,
   changePage,
   calculatePageNumbers,
@@ -407,4 +421,5 @@ export {
   emailRegistration,
   emailApproval,
   emailReject,
+  getEmailAdmin,
 };

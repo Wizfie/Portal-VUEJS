@@ -106,7 +106,7 @@ const approveFile = async (filesGroup) => {
 
       handleSuccess("Approved");
 
-      const emailContent = emailApproval(
+      const emailContent = await emailApproval(
         fileNameApproved.value,
         fileUploadedBy.value
       );
@@ -157,7 +157,7 @@ const rejectFile = async () => {
         await registrationById(id.value);
         handleSuccess("Reject File Success");
 
-        const emailContent = emailReject(
+        const emailContent = await emailReject(
           rejectFileName.value,
           fileUploadedBy.value,
           rejectReason.value

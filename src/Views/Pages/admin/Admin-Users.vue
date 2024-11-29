@@ -23,7 +23,10 @@ import NavButtonGroup from "@/components/NavButtonGroup.vue";
 
 const store = useStore();
 const loginData = ref("");
+<<<<<<< HEAD
 const token = ref();
+=======
+>>>>>>> 60db218 (update)
 const usersData = ref([]);
 const currentPage = ref(1);
 const totalPages = ref(1);
@@ -45,7 +48,10 @@ const showUpdateUserModal = ref(false);
 
 onMounted(() => {
   loginData.value = store.getters.getUserData;
+<<<<<<< HEAD
   token.value = store.getters.getAuthToken;
+=======
+>>>>>>> 60db218 (update)
   fetchUsers();
   holdPage(currentPage);
 });
@@ -141,12 +147,16 @@ const updateUser = async () => {
   try {
     const response = await axios.put(
       `/auth/update/${selectedUser.value.id}`,
+<<<<<<< HEAD
       selectedUser.value,
       {
         headers: {
           Authorization: "Bearer " + token.value,
         },
       }
+=======
+      selectedUser.value
+>>>>>>> 60db218 (update)
     );
     handleSuccess("User" + selectedUser.value.username, "Successfully updated");
     console.log(response.data);
@@ -288,6 +298,10 @@ const changePageNumber = async (pageNumber) => {
               <option disabled selected value="">--Pilih Peran--</option>
               <option value="USER">PENGGUNA</option>
               <option value="JURI">JURI</option>
+<<<<<<< HEAD
+=======
+              <option value="LEADER">PIMPINAN</option>
+>>>>>>> 60db218 (update)
             </select>
           </div>
           <button
@@ -548,9 +562,14 @@ const changePageNumber = async (pageNumber) => {
           >
             <option value="USER">PENGGUNA</option>
             <option value="JURI">JURI</option>
+<<<<<<< HEAD
             <option v-if="loginData.role == `ADMIN`" value="ADMIN">
               ADMIN
             </option>
+=======
+            <option value="LEADER">PIMPINAN</option>
+            <option value="ADMIN">ADMIN</option>
+>>>>>>> 60db218 (update)
           </select>
         </div>
 

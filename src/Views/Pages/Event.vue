@@ -47,7 +47,6 @@ const totalPages = ref();
 const pageSize = ref();
 const totalElements = ref();
 const nipPattern = /^\d{2}-\d{4}$/;
-const emailKomite = ref("wiz.fie@gmail.com");
 
 onMounted(() => {
   initFlowbite();
@@ -99,11 +98,15 @@ const registerEvent = async () => {
 
     handleSuccess("Pendaftaran berhasil");
 
-    const emailContent = emailRegistration(selectedTeam, selectedEvent, user);
+    const emailContent = await emailRegistration(
+      selectedTeam,
+      selectedEvent,
+      user
+    );
 
     const mailRequest = {
       to: [user.value.email],
-      cc: [emailKomite],
+      cc: [],
       bcc: [user.value.email],
       subject: "Notification Registration",
       text: emailContent,
@@ -113,7 +116,6 @@ const registerEvent = async () => {
     };
 
     await sendEmail(mailRequest);
-    handleSuccess("Success send email");
   } catch (error) {
     console.error("Gagal mendaftarkan tim:", error);
     handleError("Pendaftaran gagal");
