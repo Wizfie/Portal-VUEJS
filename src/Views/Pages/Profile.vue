@@ -23,6 +23,8 @@ const showPassword = ref(false);
 const isLoading = ref(false);
 const isEditing = ref(false);
 const nipError = ref(false);
+const originalUsers = ref({});
+
 const users = ref({
   nip: "",
   username: "",
@@ -45,6 +47,7 @@ const getUsers = async () => {
     });
 
     users.value = res.data;
+    originalUsers.value = { ...res.data };
   } catch (error) {
     console.error("Fail get Users " + error);
   }
@@ -61,14 +64,34 @@ const toggleEdit = () => {
 const saveProfileChanges = async () => {
   try {
     isLoading.value = true;
-    const response = await axios.put(
-      `/auth/update/${userData.value.id}`,
-      users.value
-    );
 
-    handleSuccess("Profil berhasil diperbarui!");
-    isEditing.value = false;
-    console.log(response.status);
+    const updatedData = {};
+
+    if (users.value.username !== originalUsers.value.username) {
+      updatedData.username = users.value.username;
+    }
+    if (users.value.nip !== originalUsers.value.nip) {
+      updatedData.nip = users.value.nip;
+    }
+    if (users.value.email !== originalUsers.value.email) {
+      updatedData.email = users.value.email;
+    }
+    if (users.value.role !== originalUsers.value.role) {
+      updatedData.role = users.value.role;
+    }
+
+    // Kirim hanya data yang berubah
+    if (Object.keys(updatedData).length > 0) {
+      const response = await axios.put(
+        `/auth/update/${userData.value.id}`,
+        updatedData
+      );
+      handleSuccess("Profil berhasil diperbarui!");
+      isEditing.value = false;
+      console.log(response.status);
+    } else {
+      handleError("Tidak ada perubahan yang dilakukan.");
+    }
   } catch (error) {
     console.error("ERROR Update : " + error);
     if (error.response) {
