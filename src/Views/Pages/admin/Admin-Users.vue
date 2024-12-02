@@ -40,6 +40,7 @@ const selectedUser = ref({
   email: "",
   password: "",
   nip: "",
+  emailPassword: "",
 });
 const showUpdateUserModal = ref(false);
 
@@ -505,6 +506,20 @@ const changePageNumber = async (pageNumber) => {
         </div>
         <div>
           <label
+            for="email-password"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Email Password</label
+          >
+          <input
+            type="password"
+            name="email-password"
+            id="email-password"
+            v-model="selectedUser.emailPassword"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+          />
+        </div>
+        <div>
+          <label
             for="update-nip"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >NIP</label
@@ -547,14 +562,8 @@ const changePageNumber = async (pageNumber) => {
           >
             <option value="USER">PENGGUNA</option>
             <option value="JURI">JURI</option>
-            <<<<<<< HEAD
-            <option v-if="loginData.role == `ADMIN`" value="ADMIN">
-              ADMIN
-            </option>
-            =======
             <option value="LEADER">PIMPINAN</option>
             <option value="ADMIN">ADMIN</option>
-            >>>>>>> 60db218 (update)
           </select>
         </div>
 
