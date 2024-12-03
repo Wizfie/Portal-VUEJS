@@ -155,6 +155,9 @@ const emailRegistration = async (selectedTeam, selectedEvent, user) => {
   `;
 };
 
+const websiteURL = `${import.meta.env.VITE_HOSTNAME}${
+  import.meta.env.VITE_PORT
+}`;
 const emailEvent = async (eventData) => {
   const steps = eventData.steps;
 
@@ -168,9 +171,6 @@ const emailEvent = async (eventData) => {
   const latestEndDate = steps.reduce((latest, step) => {
     return latest > step.endDate ? latest : step.endDate;
   }, steps[0].endDate);
-
-  const websiteURL =
-    import.meta.env.VITE_WEBSITE_URL || "http://localhost:8080";
 
   // Susun email HTML
   return `

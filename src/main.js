@@ -22,15 +22,11 @@ if (authToken && authData) {
 
 const app = createApp(App);
 
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080/api"; // Fallback ke default jika kosong
+const apiUrl = `${import.meta.env.VITE_HOSTNAME}${
+  import.meta.env.VITE_PORT
+}/api`;
 
 // Set base URL untuk Axios
 axios.defaults.baseURL = apiUrl;
-
-// Axios global
-// axios.defaults.baseURL = "http://10.129.48.138:8080/api";
-// axios.defaults.baseURL = "http://172.20.10.2:8080/api";
-// axios.defaults.baseURL = "http://192.168.199.199:8080/api";
-// axios.defaults.baseURL = "http://192.168.1.7:8080/api";
 
 app.use(router).use(store).mount("#app");
