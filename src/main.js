@@ -9,8 +9,6 @@ import "./index.css";
 import "flowbite/dist/flowbite.css";
 import "flowbite";
 
-// Import Flowbite JavaScript
-
 const authToken = localStorage.getItem("authToken");
 const userDataString = localStorage.getItem("userData");
 const authData = userDataString ? JSON.parse(userDataString) : null;
@@ -22,7 +20,7 @@ if (authToken && authData) {
 
 const app = createApp(App);
 
-const apiUrl = `${import.meta.env.VITE_HOSTNAME}${
+const apiUrl = `${import.meta.env.VITE_HOSTNAME}:${
   import.meta.env.VITE_PORT
 }/api`;
 
