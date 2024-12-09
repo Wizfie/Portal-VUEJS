@@ -14,6 +14,9 @@ import {
   isSidebarOpen,
   sidebarToggle,
   sendEmail,
+  getEmailCc,
+  ccEmail,
+  emailUploadFile,
 } from "@/utils/utils";
 import spinner from "@/components/Spinner.vue";
 
@@ -89,20 +92,30 @@ const uploadFiles = async (stepId) => {
           ? `${fileCount} file berhasil diunggah.`
           : `${fileCount} file berhasil diunggah.`;
 
-      handleSuccess(successMessage);
-      // const mailRequest = {
-      //   to: ["wizfiee@gmail.com"],
-      //   cc: [],
-      //   bcc: [user.value.email],
-      //   subject: "Notification",
-      //   text: "This is a notification email.\n Upload File",
-      //   name: user.value.username,
-      //   from: "wiz.fie@gmail.com",
-      //   isFromAdmin: false,
-      // };
+      // Ambil informasi cc dari backend (misalnya role "LEADER")
+      await getEmailCc("LEADER", user.value.department);
 
-      // await sendEmail(mailRequest);
-      // handleSuccess("Success send email");
+      const fileNames = selectedFiles.value[stepId].map((file) => file.name);
+
+      const emailContent = await emailUploadFile(
+        fileNames,
+        user.value.username
+      );
+
+      console.log("USERRR " + user.value.username);
+
+      // Kirim email pemberitahuan setelah file berhasil diunggah
+      const mailRequest = {
+        to: [user.value.email],
+        cc: ccEmail.value,
+        bcc: [],
+        subject: `Notifikasi Upload File ${registeredData.value.event.eventName}`,
+        text: emailContent,
+      };
+
+      await sendEmail(mailRequest);
+
+      // handleSuccess(successMessage);
     });
   } catch (error) {
     console.error(error);
@@ -156,7 +169,6 @@ const getRegisteredById = async () => {
     try {
       const res = await axios.get(`/registration/${registrationId.value}`);
       registeredData.value = res.data;
-      console.log(registeredData.value);
 
       // Filter dan atur pengelompokan file berkas
       filteredBerkas.value = registeredData.value.event.stages.filter(

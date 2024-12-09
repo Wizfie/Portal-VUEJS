@@ -4,16 +4,37 @@ import axios from "axios";
 
 const isLoading = ref(false);
 const adminEmail = ref();
+const ccEmail = ref([]);
 
 const validateNip = (nip) => {
   const nipPattern = /^\d{2}-\d{4}$/; // Format 23-1234
   return nipPattern.test(nip);
 };
 
+const getEmailCc = async (role, department) => {
+  try {
+    const res = await axios.get("/auth/emails", {
+      params: {
+        role: role,
+        department: department,
+      },
+    });
+    const data = await res.data;
+    ccEmail.value = data.map((item) => item.email);
+  } catch (error) {
+    console.error("FAIL GET CC " + error.message);
+  }
+};
+
 const getEmailAdmin = async () => {
   try {
-    const response = await axios.get("/auth/admin");
-    adminEmail.value = response.data[0].email;
+    const response = await axios.get("/auth/emails", {
+      params: {
+        role: "ADMIN",
+      },
+    });
+    const data = response.data;
+    adminEmail.value = data.map((item) => item.email);
     console.log(adminEmail.value);
   } catch (error) {
     console.error("Fail get email Admin " + error);
@@ -68,6 +89,52 @@ const emailReject = async (file, user, reasons) => {
   `;
 };
 
+const emailUploadFile = async (files, user) => {
+  await getEmailAdmin();
+  const currentDate = new Date().toLocaleDateString("id-ID", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const username = user;
+  const fileList = Array.isArray(files)
+    ? files.map((file) => `<li>${file}</li>`).join("")
+    : `<li>${files}</li>`;
+
+  // Susun email HTML
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+        }
+        h3 {
+          color: #2a5d9f;
+        }
+      </style>
+    </head>
+    <body>
+      <H3>Hi Team ${username},</H3>
+    <p>Kami dengan senang hati menginformasikan bahwa file Anda terkait kegiatan Continuous Improvement (QCC & Suggestion System) telah berhasil ter Upload.</p>
+    <p>Detail:</p>
+    <ul>
+      <strong>Nama File:</strong>
+      ${fileList}
+      <li><strong>Tanggal Upload :</strong> ${currentDate}</li>
+    </ul>
+    <p>Terima kasih atas kontribusi berharga Anda dalam kegiatan Continuous Improvement ini. Kami sangat mengapresiasi dedikasi Anda dalam mendukung upaya peningkatan berkelanjutan ini.
+    </p>
+    <p>Jika Anda memiliki pertanyaan lebih lanjut, jangan ragu untuk menghubungi kami di <a href=mailto:${adminEmail.value}> [Kontak Kami] </a></p>
+    <p>Salam hangat,</p>
+    <p>Komite Continuous Improvement Logistic</p>
+    </body>
+    </html>
+  `;
+};
 const emailApproval = async (file, user) => {
   await getEmailAdmin();
   const currentDate = new Date().toLocaleDateString("id-ID", {
@@ -155,9 +222,7 @@ const emailRegistration = async (selectedTeam, selectedEvent, user) => {
   `;
 };
 
-const websiteURL = `${import.meta.env.VITE_HOSTNAME}${
-  import.meta.env.VITE_PORT
-}`;
+const websiteURL = `${import.meta.env.VITE_WEB_URL}`;
 const emailEvent = async (eventData) => {
   const steps = eventData.steps;
 
@@ -223,15 +288,11 @@ const emailEvent = async (eventData) => {
 
 const sendEmail = async (mailRequest) => {
   try {
-    isLoading.value = true;
-
     await axios.post("/email/send", mailRequest);
 
     console.info("Email Send");
   } catch (error) {
     console.error("Error sending email:", error);
-  } finally {
-    isLoading.value = false;
   }
 };
 
@@ -422,4 +483,7 @@ export {
   emailApproval,
   emailReject,
   getEmailAdmin,
+  getEmailCc,
+  ccEmail,
+  emailUploadFile,
 };

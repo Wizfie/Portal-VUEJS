@@ -22,7 +22,7 @@ import axios from "axios";
 import NavButtonGroup from "@/components/NavButtonGroup.vue";
 
 const store = useStore();
-const loginData = ref("");
+const user = ref("");
 const token = ref();
 const usersData = ref([]);
 const currentPage = ref(1);
@@ -33,6 +33,7 @@ const email = ref("");
 const password = ref("");
 const role = ref("");
 const nip = ref("");
+const dept = ref("");
 const searchQuery = ref("");
 const showRegistration = ref(false);
 const selectedUser = ref({
@@ -41,11 +42,13 @@ const selectedUser = ref({
   password: "",
   nip: "",
   emailPassword: "",
+  role: "",
+  department: "",
 });
 const showUpdateUserModal = ref(false);
 
 onMounted(() => {
-  loginData.value = store.getters.getUserData;
+  user.value = store.getters.getUserData;
   token.value = store.getters.getAuthToken;
 
   fetchUsers();
@@ -69,6 +72,8 @@ const resetForm = () => {
   password.value = "";
   nip.value = "";
   role.value = "";
+  dept.value = "";
+
   showRegistration.value = false;
   showUpdateUserModal.value = false;
   fetchUsers();
@@ -82,6 +87,7 @@ const Registration = async () => {
       nip: nip.value,
       email: email.value,
       role: role.value,
+      department: dept.value.toUpperCase(),
     };
 
     try {
@@ -145,10 +151,10 @@ const updateUser = async () => {
       `/auth/update/${selectedUser.value.id}`,
       selectedUser.value
     );
-    handleSuccess("User" + selectedUser.value.username, "Successfully updated");
+    handleSuccess(selectedUser.value.username, "Successfully updated");
     console.log(response.data);
   } catch (error) {
-    handleError("User" + selectedUser.value.username, "Failed to update");
+    handleError(selectedUser.value.username, "Failed to update");
     console.error("ERROR UPDATE USER : " + error);
   } finally {
     resetForm();
@@ -251,10 +257,19 @@ const changePageNumber = async (pageNumber) => {
           <div class="mb-5">
             <input
               v-model="nip"
-              type="nip"
+              type="text"
               id="nip"
               class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
               placeholder="NIP (22-0123)"
+            />
+          </div>
+          <div class="mb-5">
+            <input
+              v-model="dept"
+              type="text"
+              id="dept"
+              class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+              placeholder="Department"
             />
           </div>
           <div class="mb-5">
@@ -285,9 +300,7 @@ const changePageNumber = async (pageNumber) => {
               <option disabled selected value="">--Pilih Peran--</option>
               <option value="USER">PENGGUNA</option>
               <option value="JURI">JURI</option>
-              <<<<<<< HEAD =======
               <option value="LEADER">PIMPINAN</option>
-              >>>>>>> 60db218 (update)
             </select>
           </div>
           <button
@@ -332,6 +345,7 @@ const changePageNumber = async (pageNumber) => {
                 <th scope="col" class="px-6 py-3">No</th>
                 <th scope="col" class="px-6 py-3">Nama Pengguna</th>
                 <th scope="col" class="px-6 py-3">Nip</th>
+                <th scope="col" class="px-6 py-3">Department</th>
                 <th scope="col" class="px-6 py-3">Email</th>
                 <th scope="col" class="px-6 py-3">Peran</th>
                 <th scope="col" class="px-6 py-3">Aksi</th>
@@ -351,6 +365,9 @@ const changePageNumber = async (pageNumber) => {
                   {{ user.username }}
                 </th>
                 <td class="px-6 py-4">{{ user.nip ? user.nip : "-" }}</td>
+                <td class="px-6 py-4">
+                  {{ user.department ? user.department : "-" }}
+                </td>
                 <td class="px-6 py-4">{{ user.email ? user.email : "-" }}</td>
                 <td class="px-6 py-4">{{ user.role }}</td>
                 <td class="px-6 py-4">
@@ -504,14 +521,14 @@ const changePageNumber = async (pageNumber) => {
             placeholder="nama@perusahaan.com"
           />
         </div>
-        <div>
+        <div v-if="selectedUser.role == 'ADMIN'">
           <label
             for="email-password"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >Email Password</label
           >
           <input
-            type="password"
+            type="text"
             name="email-password"
             id="email-password"
             v-model="selectedUser.emailPassword"
@@ -531,6 +548,24 @@ const changePageNumber = async (pageNumber) => {
             v-model="selectedUser.nip"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
             placeholder="22-0123"
+          />
+        </div>
+        <div>
+          <label
+            for="update-dept"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Department</label
+          >
+          <input
+            type="text"
+            name="dept"
+            id="update-dept"
+            v-model="selectedUser.department"
+            @input="
+              selectedUser.department = selectedUser.department.toUpperCase()
+            "
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+            placeholder="Department"
           />
         </div>
         <div>

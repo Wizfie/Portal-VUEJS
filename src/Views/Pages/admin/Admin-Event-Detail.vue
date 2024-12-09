@@ -17,6 +17,8 @@ import {
   isLoading,
   emailApproval,
   emailReject,
+  getEmailCc,
+  ccEmail,
 } from "@/utils/utils";
 
 const store = useStore();
@@ -111,14 +113,15 @@ const approveFile = async (filesGroup) => {
         fileUploadedBy.value
       );
 
+      await getEmailCc("LEADER", user.value.department);
+
       const mailRequest = {
         to: [user.value.email],
-        cc: [],
-        bcc: ["wiz.fie@gmail.com"],
+        cc: ccEmail.value,
+        bcc: [],
         subject: "Notification File Approved",
         text: emailContent,
         name: "Admin",
-        from: "admin@example.com",
       };
 
       await sendEmail(mailRequest);
@@ -163,15 +166,15 @@ const rejectFile = async () => {
           rejectReason.value
         );
 
+        await getEmailCc("LEADER", user.value.department);
+
         const mailRequest = {
-          to: ["wiz.fie@gmail.com"],
-          cc: [],
-          bcc: [user.value.email],
+          to: [user.value.email],
+          cc: ccEmail.value,
+          bcc: [],
           subject: "Notification file Rejected",
           text: emailContent,
           name: "Admin",
-          from: "admin@example.com",
-          isFromAdmin: true,
         };
 
         await sendEmail(mailRequest);

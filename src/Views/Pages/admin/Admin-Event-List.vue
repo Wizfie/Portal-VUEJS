@@ -13,7 +13,8 @@ import {
   isSidebarOpen,
   sendEmail,
   emailEvent,
-  getEmailAdmin,
+  getEmailCc,
+  ccEmail,
 } from "@/utils/utils";
 
 const store = useStore();
@@ -241,10 +242,12 @@ const createEvent = async () => {
         .map((user) => user.email)
         .filter((email) => email);
 
+      await getEmailCc("LEADER", null);
+
       // Kirim email ke backend
       const mailRequest = {
         to: toEmails,
-        cc: [],
+        cc: ccEmail.value,
         bcc: [user.value.email],
         subject: `Undangan Partisipasi Program ${eventData.event.eventName}`,
         text: emailContent,

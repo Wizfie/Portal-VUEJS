@@ -19,6 +19,8 @@ import {
   formatDate,
   sendEmail,
   emailRegistration,
+  ccEmail,
+  getEmailCc,
 } from "@/utils/utils";
 
 const store = useStore();
@@ -51,6 +53,8 @@ const nipPattern = /^\d{2}-\d{4}$/;
 onMounted(() => {
   initFlowbite();
   user.value = store.getters.getUserData;
+
+  console.log(user.value.department);
 
   getEvents();
   fetchTeams();
@@ -104,14 +108,15 @@ const registerEvent = async () => {
       user
     );
 
+    await getEmailCc("LEADER", user.value.department);
+
     const mailRequest = {
       to: [user.value.email],
-      cc: [],
-      bcc: [user.value.email],
+      cc: ccEmail.value,
+      bcc: [],
       subject: "Notification Registration",
       text: emailContent,
       name: user.value.username,
-      from: "wiz.fie@gmail.com",
       isFromAdmin: false,
     };
 

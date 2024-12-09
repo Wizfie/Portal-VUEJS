@@ -8,7 +8,8 @@ const username = ref("");
 const password = ref("");
 const nip = ref("");
 const email = ref("");
-const role = ref("USER");
+const role = ref("");
+const dept = ref("");
 
 const Registration = async () => {
   withLoading(async () => {
@@ -18,18 +19,18 @@ const Registration = async () => {
       nip: nip.value,
       email: email.value,
       role: role.value,
+      department: dept.value,
     };
 
     try {
       if (username.value !== "" && password.value !== "") {
-        isLoading.value = true;
         const response = await axios.post("/auth/register", userData);
         console.log(response);
         handleSuccess("Registration , Success");
         router.push({ name: "login" });
       }
     } catch (error) {
-      handleError(error + " : " + error.response.data.message);
+      handleError(error);
     }
   });
 };
@@ -40,71 +41,69 @@ const Registration = async () => {
     <Spinner v-if="isLoading"></Spinner>
     <form
       @submit.prevent="Registration"
-      class="max-w-sm mx-auto border-2 rounded-xl shadow-xl p-5 m-sm-5"
+      class="w-50 mx-auto border-2 rounded-xl shadow-xl p-8"
     >
-      <h1 class="block mb-5 text-2xl font-semibold text-center">My Apps</h1>
+      <h1 class="block mb-5 text-2xl font-semibold text-center">Register</h1>
 
-      <div class="mb-3">
-        <div class="flex">
-          <span
-            class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-e-0 border-gray-300 rounded-s-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600"
-          >
-            <svg
-              class="w-4 h-4 text-gray-800 dark:text-white"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 14 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M7 8a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-2 3h4a4 4 0 0 1 4 4v2H1v-2a4 4 0 0 1 4-4Z"
-              />
-            </svg>
-          </span>
-          <input
-            v-model="username"
-            required
-            type="text"
-            id="website-admin"
-            class="rounded-none rounded-e-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Username"
-          />
-        </div>
+      <div class="mb-5">
+        <input
+          v-model="username"
+          type="username"
+          id="username"
+          class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+          placeholder="Nama Pengguna"
+          required
+        />
       </div>
-      <div class="mb-3">
-        <div class="flex">
-          <span
-            class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-e-0 border-gray-300 rounded-s-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600"
-          >
-            <svg
-              class="w-4 h-4 text-gray-800 dark:text-white"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 16 20"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M11.5 8V4.5a3.5 3.5 0 1 0-7 0V8M8 12v3M2 8h12a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"
-              />
-            </svg>
-          </span>
-          <input
-            v-model="password"
-            type="password"
-            required
-            id="website-admin"
-            class="rounded-none rounded-e-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Password"
-          />
-        </div>
+      <div class="mb-5">
+        <input
+          v-model="nip"
+          type="text"
+          id="nip"
+          class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+          placeholder="NIP (22-0123)"
+        />
+      </div>
+      <div class="mb-5">
+        <input
+          v-model="dept"
+          type="text"
+          id="dept"
+          class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+          placeholder="Department"
+        />
+      </div>
+      <div class="mb-5">
+        <input
+          v-model="email"
+          type="email"
+          id="email"
+          class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+          placeholder="Email"
+        />
+      </div>
+      <div class="mb-5">
+        <input
+          v-model="password"
+          type="password"
+          id="password"
+          placeholder="Kata Sandi"
+          class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+          required
+        />
+      </div>
+      <div class="mb-5">
+        <select
+          v-model="role"
+          required
+          class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+        >
+          <option disabled selected value="">--Pilih Peran--</option>
+          <option value="USER">PENGGUNA</option>
+          <option value="JURI">JURI</option>
+          <option value="LEADER">PIMPINAN</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
       </div>
 
       <!--  -->
