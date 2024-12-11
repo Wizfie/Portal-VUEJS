@@ -44,7 +44,6 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 const currentRoute = route.path;
-console.log(currentRoute);
 </script>
 
 <style scoped>

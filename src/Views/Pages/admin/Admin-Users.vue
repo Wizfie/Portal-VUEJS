@@ -44,6 +44,7 @@ const selectedUser = ref({
   emailPassword: "",
   role: "",
   department: "",
+  active: true,
 });
 const showUpdateUserModal = ref(false);
 
@@ -95,7 +96,6 @@ const Registration = async () => {
         const response = await axios.post("/auth/register", userData);
         console.log(response);
         handleSuccess("Registration", "Successfully created");
-        console.log("CREATED");
       }
     } catch (error) {
       handleError("Registration", "Failed to create");
@@ -109,7 +109,6 @@ const Registration = async () => {
 const fetchUsers = async () => {
   isLoading.value = true;
   try {
-    console.log(currentPage.value);
     const response = await axios.get("/auth/users", {
       headers: {
         Authorization: "Bearer " + token.value,
@@ -130,6 +129,8 @@ const fetchUsers = async () => {
       currentPage.value,
       totalPages.value
     );
+
+    console.log(usersData.value);
   } catch (error) {
     console.error("ERROR FETCH USER : " + error);
   } finally {
@@ -152,9 +153,28 @@ const updateUser = async () => {
       selectedUser.value
     );
     handleSuccess(selectedUser.value.username, "Successfully updated");
-    console.log(response.data);
   } catch (error) {
     handleError(selectedUser.value.username, "Failed to update");
+    console.error("ERROR UPDATE USER : " + error);
+  } finally {
+    resetForm();
+  }
+};
+const toggleActiveUser = async (user) => {
+  const result = await Swal.fire({
+    position: "center",
+    title: "Ubah Status?",
+    showConfirmButton: true,
+    showCancelButton: true,
+  });
+  if (!result.isConfirmed) return;
+  try {
+    const updatedUser = { ...user, active: !user.active };
+
+    await axios.put(`/auth/update/${user.id}`, updatedUser);
+    handleSuccess(user.username, "Successfully updated");
+  } catch (error) {
+    handleError(user.username, "Failed to update");
     console.error("ERROR UPDATE USER : " + error);
   } finally {
     resetForm();
@@ -172,7 +192,6 @@ const removeUser = async (id) => {
   try {
     const response = await axios.delete(`/auth/users/${id}`);
     handleSuccess("User", "Successfully removed");
-    console.log(response.data);
     fetchUsers();
   } catch (ex) {
     handleError("User", "Failed to remove user");
@@ -379,11 +398,23 @@ const changePageNumber = async (pageNumber) => {
                       Edit
                     </button>
                     <button
+                      @click="toggleActiveUser(user)"
+                      class="w-full font-medium px-2 py-1 rounded-md text-white hover:bg-opacity-80 mb-1"
+                      :class="{
+                        'bg-green-500 hover:bg-green-700': user.active,
+                        'bg-red-500 hover:bg-red-700': !user.active,
+                      }"
+                      style="min-width: 5rem; min-height: 2.5rem"
+                    >
+                      {{ user.active ? "AKTIF" : "NONAKTIF" }}
+                    </button>
+
+                    <!-- <button
                       @click="removeUser(user.id)"
                       class="w-full font-medium px-2 py-2 rounded-md bg-red-500 text-white hover:bg-red-800 mb-1"
                     >
                       Hapus
-                    </button>
+                    </button> -->
                   </div>
                 </td>
               </tr>
