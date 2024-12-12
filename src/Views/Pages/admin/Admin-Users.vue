@@ -298,6 +298,7 @@ const changePageNumber = async (pageNumber) => {
               id="email"
               class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
               placeholder="Email"
+              required
             />
           </div>
           <div class="mb-5">
@@ -550,6 +551,7 @@ const changePageNumber = async (pageNumber) => {
             v-model="selectedUser.email"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
             placeholder="nama@perusahaan.com"
+            required
           />
         </div>
         <div v-if="selectedUser.role == 'ADMIN'">
@@ -597,6 +599,7 @@ const changePageNumber = async (pageNumber) => {
             "
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
             placeholder="Department"
+            required
           />
         </div>
         <div>
