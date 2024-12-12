@@ -35,7 +35,7 @@ const getEmailAdmin = async () => {
     });
     const data = response.data;
     adminEmail.value = data.map((item) => item.email);
-    console.log(adminEmail.value);
+    // console.log(adminEmail.value);
   } catch (error) {
     console.error("Fail get email Admin " + error);
   }
@@ -363,7 +363,7 @@ const isSidebarOpen = ref(false);
 
 const sidebarToggle = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
-  console.log("Sidebar toggled:", isSidebarOpen.value);
+  // console.log("Sidebar toggled:", isSidebarOpen.value);
 };
 
 const handleAlert = (icon, ...args) => {

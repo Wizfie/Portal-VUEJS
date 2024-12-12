@@ -232,7 +232,7 @@ onMounted(() => {
   registrationList();
   holdPage(currentPage);
   userData.value = store.getters.getUserData;
-  console.log(userData.value);
+  // console.log(userData.value);
 });
 
 // Mendapatkan daftar registrasi
@@ -252,7 +252,7 @@ const registrationList = () => {
       totalElements.value = response.data.totalElements;
 
       localStorage.setItem("currentPage", currentPage.value);
-      console.log(registrations.value);
+      // console.log(registrations.value);
 
       pageNumbers.value = calculatePageNumbers(
         currentPage.value,

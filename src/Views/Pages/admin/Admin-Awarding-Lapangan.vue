@@ -657,7 +657,7 @@ const getFinalScore = async () => {
     try {
       const response = await axios.get("/evaluasi/final");
       teams.value = response.data;
-      console.log(teams.value);
+      // console.log(teams.value);
     } catch (error) {
       console.error("Error fetching data:", error);
     }

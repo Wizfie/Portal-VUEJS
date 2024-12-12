@@ -18,7 +18,6 @@ import {
 } from "@/utils/utils.js";
 import NavButtonGroup from "@/components/NavButtonGroup.vue";
 
-const events = ref([]);
 const userId = ref();
 const role = ref(null);
 const currentPage = ref();
@@ -43,7 +42,6 @@ onMounted(() => {
     userId.value = parseJson.id.toString();
     role.value = parseJson.role;
   }
-  getEvents();
   holdPage(currentPage);
   fetchTeam();
 });
@@ -81,16 +79,6 @@ const saveEdit = async (teamId) => {
 
 const cancelEdit = () => {
   isEditing.value = null;
-};
-
-const getEvents = () => {
-  withLoading(async () => {
-    const response = await axios.get("/event/get-event");
-    const filteredEvents = response.data.filter(
-      (item) => item.event.eventYear === currentYear
-    );
-    events.value = filteredEvents.map((item) => item.event);
-  });
 };
 
 const fetchTeam = async () => {

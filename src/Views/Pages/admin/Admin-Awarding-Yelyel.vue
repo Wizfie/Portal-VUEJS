@@ -320,13 +320,12 @@ const getAwardingYelyel = async () => {
   withLoading(async () => {
     try {
       const params = !showAllYears.value ? { year: year.value } : { year: "" };
-      console.log(params);
-
+      // console.log(params);
       const response = await axios.get("/yelyel/final-scores", {
         params,
       });
       yelyelList.value = response.data;
-      console.log(yelyelList.value);
+      // console.log(yelyelList.value);
     } catch (error) {
       console.error("Error fetching data:", error);
     }

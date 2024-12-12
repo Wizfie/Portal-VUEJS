@@ -282,7 +282,7 @@ const getEvent = async () => {
     return new Date(event.eventYear).getFullYear() === year;
   });
   events.value = filteredEvents;
-  console.log(events.value);
+  // console.log(events.value);
 };
 
 const evaluasiFinal = async () => {

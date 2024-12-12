@@ -133,7 +133,7 @@
             >
             <input
               v-model.trim="filterKeyword"
-              @input="handleSearch(filterKeyword, getListEvaluasiLapangan)"
+              @input="handleSearch(filterKeyword, getListEvaluasiYelyel)"
               id="filterKeyword"
               type="search"
               class="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 sm:w-auto text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -150,7 +150,6 @@
               <tr>
                 <th scope="col" class="px-6 py-3">No</th>
                 <th scope="col" class="px-6 py-3">Dept</th>
-                <th scope="col" class="px-6 py-3">Tim</th>
                 <th scope="col" class="px-6 py-3">Event</th>
                 <th scope="col" class="px-6 py-3">Skor</th>
                 <th scope="col" class="px-6 py-3">Juri</th>
@@ -167,10 +166,9 @@
                     {{ index + 1 + (currentPage - 1) * pageSize }}
                   </td>
                   <td class="px-6 py-4">{{ list.deptName }}</td>
-                  <td class="px-6 py-4">{{ list.teamName }}</td>
                   <td class="px-6 py-4">{{ list.eventName }}</td>
                   <td class="px-6 py-4">
-                    {{ formatScore(list.scoreLapangan) }}
+                    {{ formatScore(list.score) }}
                   </td>
                   <td class="px-6 py-4">{{ list.juriName }}</td>
                   <td class="px-6 py-4">
@@ -379,10 +377,10 @@ const totalElements = ref(0);
 const evaluationList = ref([]);
 const detailevaluationList = ref([]);
 
-const getListEvaluasiLapangan = async () => {
+const getListEvaluasiYelyel = async () => {
   withLoading(async () => {
     try {
-      const response = await axios.get("/lapangan/evaluation-list", {
+      const response = await axios.get("/yelyel/evaluations-list", {
         params: {
           page: currentPage.value,
           search: filterKeyword.value,
@@ -393,6 +391,8 @@ const getListEvaluasiLapangan = async () => {
       totalPages.value = response.data.totalPages;
       pageSize.value = response.data.pageSize;
       totalElements.value = response.data.totalElements;
+
+      console.log(evaluationList.value);
     } catch (error) {
       handleError("Gagal Memuat data ...");
     }
@@ -433,7 +433,7 @@ const updateScore = async () => {
     await axios.put("/lapangan/update-scores", detailevaluationList.value);
     handleSuccess("Skor diperbarui");
     closeDetail();
-    getListEvaluasiLapangan();
+    getListEvaluasiYelyel();
   } catch (error) {
     handleError("Gagal memperbarui skor");
   }
@@ -492,7 +492,7 @@ const resetExport = () => {
 
 const changePageNumber = async (newPage) => {
   currentPage.value = newPage;
-  await changePage(newPage, getListEvaluasiLapangan, totalPages);
+  await changePage(newPage, getListEvaluasiYelyel, totalPages);
 };
 
 const pageNumbers = computed(() => {
@@ -500,7 +500,7 @@ const pageNumbers = computed(() => {
 });
 
 onMounted(() => {
-  getListEvaluasiLapangan(currentPage.value);
+  getListEvaluasiYelyel(currentPage.value);
   getAttributes();
 });
 </script>

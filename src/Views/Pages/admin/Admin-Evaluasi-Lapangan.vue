@@ -379,9 +379,8 @@ const getListEvaluasiLapangan = async () => {
           search: filterKeyword.value,
         },
       });
-      console.log(currentPage.value);
-
-      console.log(response.data);
+      // console.log(currentPage.value);
+      // console.log(response.data);
       evaluationList.value = response.data.data;
 
       currentPage.value = response.data.currentPage;
@@ -401,10 +400,10 @@ const getAttributes = async () => {
     eventList.value = response.data.events;
     teamsList.value = response.data.teams;
     createdAtList.value = response.data.createdAt;
-    console.log(juriList.value);
-    console.log(teamsList.value);
-    console.log(eventList.value);
-    console.log(createdAtList.value);
+    // console.log(juriList.value);
+    // console.log(teamsList.value);
+    // console.log(eventList.value);
+    // console.log(createdAtList.value);
   });
 };
 
