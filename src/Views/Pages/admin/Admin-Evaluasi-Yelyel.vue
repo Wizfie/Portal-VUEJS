@@ -178,10 +178,9 @@
                     <a
                       class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
                       @click="
-                        getDetailsLapangan(
-                          list.teamId,
-                          list.userId,
-                          list.eventId,
+                        getDetailsYelyel(
+                          list.deptId,
+                          list.juriId,
                           list.createdAt
                         )
                       "
@@ -401,7 +400,7 @@ const getListEvaluasiYelyel = async () => {
 
 const getAttributes = async () => {
   withLoading(async () => {
-    const response = await axios.get("/lapangan/attributes");
+    const response = await axios.get("/yelyel/attributes");
     juriList.value = response.data.juris;
     eventList.value = response.data.events;
     teamsList.value = response.data.teams;
@@ -409,28 +408,36 @@ const getAttributes = async () => {
   });
 };
 
-const getDetailsLapangan = async (teamId, userId, eventId, createdAt) => {
+const getDetailsYelyel = async (deptId, juriId, createdAt) => {
+  console.log(deptId);
+  console.log(juriId);
+  console.log(createdAt);
+  
   withLoading(async () => {
     try {
-      const response = await axios.get("lapangan/detail-evaluation", {
+      const response = await axios.get("yelyel/detail-evaluation", {
         params: {
-          teamId: teamId,
-          userId: userId,
-          eventId: eventId,
-          createdAt: createdAt,
+          deptId: deptId,
+          juriId: juriId,
+          createdAt : createdAt
+          
         },
       });
       detailevaluationList.value = response.data;
       isDetailVisible.value = true;
+      console.log(response);
+      
     } catch (error) {
       handleError("Gagal mendapatkan detail");
+      console.log("ERROR" + error);
+      
     }
   });
 };
 
 const updateScore = async () => {
   try {
-    await axios.put("/lapangan/update-scores", detailevaluationList.value);
+    await axios.put("/yelyel/update-scores", detailevaluationList.value);
     handleSuccess("Skor diperbarui");
     closeDetail();
     getListEvaluasiYelyel();
@@ -452,7 +459,7 @@ const closeDetail = () => {
 
 const exportData = async () => {
   try {
-    let endpoint = "/report/evaluasi-lapangan";
+    let endpoint = "/report/evaluasi-yelyel";
     let params = {
       userId: selectedJuri.value,
       eventId: selectedEvent.value,
